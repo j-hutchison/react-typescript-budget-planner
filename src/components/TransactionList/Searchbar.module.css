@@ -1,0 +1,6 @@
+#searchbar {
+	width: 100%;
+
+	border-radius: var(---border-1);
+	padding: var(---input-padding-std);
+}

@@ -1,9 +1,12 @@
 .amount-tag {
 	background-color: var(---blue-main);
-	padding: 0.25rem 0.5rem;
+	padding: 0.25rem 0.75rem;
 	border-radius: 10px;
 }
 .amount-tag-value {
+	display: block;
+	margin: 0 auto;
+
 	font-size: 0.8rem;
 	font-weight: 500;
 	letter-spacing: 1px;

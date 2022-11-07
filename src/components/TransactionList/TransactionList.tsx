@@ -1,5 +1,5 @@
 import React from "react";
-
+import Searchbar from "./Searchbar";
 import TransactionLine from "./TransactionLine/TransactionLine";
 import classes from "./TransactionList.module.css";
 
@@ -7,11 +7,7 @@ const TransactionList = () => {
 	return (
 		<section className={classes["transaction-list"]}>
 			<h2>Expenses</h2>
-			<input
-				type="text"
-				id={classes["transaction-search"]}
-				placeholder="Type to search..."
-			/>
+			<Searchbar />
 			<section className={classes["transaction-lines"]}>
 				<TransactionLine
 					id="i1"

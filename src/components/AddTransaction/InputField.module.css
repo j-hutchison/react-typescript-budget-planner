@@ -1,0 +1,10 @@
+.input {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+.input input {
+	padding: var(---input-padding-std);
+}
+.input-label {
+}

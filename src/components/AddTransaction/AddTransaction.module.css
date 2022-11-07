@@ -1,0 +1,11 @@
+.add-transaction {
+}
+
+.add-transaction-inputs {
+	margin: 1.5rem 0;
+
+	display: flex;
+	gap: 2rem;
+
+	font-size: 1.2rem;
+}
