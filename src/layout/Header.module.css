@@ -1,0 +1,16 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+
+	padding-top: 2rem;
+}
+
+.title {
+	font-size: 3.2rem;
+}
+
+.transaction-summary {
+	display: flex;
+	gap: 2rem;
+}

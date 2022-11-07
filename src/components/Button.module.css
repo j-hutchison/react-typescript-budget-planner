@@ -1,0 +1,14 @@
+.btn {
+	color: #fff;
+	background-color: var(---blue-main);
+	border: none;
+	padding: 0.5rem 0.75rem;
+	font-size: 1.2rem;
+	border-radius: var(---border-1);
+}
+
+.btn:hover,
+.btn:active {
+	cursor: pointer;
+	box-shadow: 0 2px 5px 0px rgba(45, 45, 45, 0.596);
+}
