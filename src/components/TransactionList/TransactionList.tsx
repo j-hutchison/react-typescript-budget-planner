@@ -1,28 +1,34 @@
-import React from "react";
+import React, { useContext } from "react";
+
+// Components Import
 import Searchbar from "./Searchbar";
 import TransactionLine from "./TransactionLine/TransactionLine";
+
+// Context Import
+import { TransactionContext } from "../../context/TransactionContext";
+
+// Models Import
+import {
+	TransactionType,
+	Transaction,
+	IncomingTransaction,
+	OutgoingTransaction,
+} from "../../models/Transaction";
+
+// CSS Import
 import classes from "./TransactionList.module.css";
 
 const TransactionList = () => {
+	const { transactionList } = useContext(TransactionContext);
+
 	return (
 		<section className={classes["transaction-list"]}>
 			<h2>Expenses</h2>
 			<Searchbar />
 			<section className={classes["transaction-lines"]}>
-				<TransactionLine
-					id="i1"
-					memo="Shopping"
-					type="outgoing"
-					amount={50}
-					date={new Date()}
-				></TransactionLine>
-				<TransactionLine
-					id="i2"
-					memo="Holiday"
-					type="outgoing"
-					amount={250}
-					date={new Date()}
-				></TransactionLine>
+				{transactionList.map((transaction) => {
+					return <TransactionLine data={transaction} />;
+				})}
 			</section>
 		</section>
 	);

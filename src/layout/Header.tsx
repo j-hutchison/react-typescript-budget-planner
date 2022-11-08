@@ -15,13 +15,13 @@ const Header = () => {
 				/>
 				<TransactionSummaryTab
 					title="Remaining"
-					balance={1800}
+					balance={1700}
 					color="green"
 					editable={false}
 				/>
 				<TransactionSummaryTab
 					title="Spent so far"
-					balance={200}
+					balance={300}
 					color="blue"
 					editable={false}
 				/>

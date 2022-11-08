@@ -1,7 +1,13 @@
 :root {
 	---border-1: 3px;
 	---input-padding-std: 0.5rem 1rem;
-	---blue-main: #1d76f2;
+	---blue-btn: #1d76f2;
+	---grey: #e7e7e7;
+	---green: #ceeed8;
+	---blue: #c2e3f0;
+	---grey-font: #4d4d4d;
+	---green-font: #61836c;
+	---blue-font: #45778a;
 }
 
 html {
@@ -15,6 +21,7 @@ input:focus {
 
 * {
 	margin: 0;
+	box-sizing: border-box;
 }
 
 .wrapper {
