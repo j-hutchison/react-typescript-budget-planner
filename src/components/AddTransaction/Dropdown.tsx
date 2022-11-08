@@ -3,6 +3,7 @@ import classes from "./Dropdown.module.css";
 
 interface DropdownProps {
 	transactionTypes: { name: string }[];
+	onChangeHandler: (type: string) => void;
 }
 
 const Dropdown: React.FC<DropdownProps> = (props) => {
@@ -24,6 +25,8 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
 	) => {
 		const selectedElement = event.target as HTMLInputElement;
 		setTransactionType(() => selectedElement.innerHTML);
+
+		props.onChangeHandler(selectedElement.innerHTML);
 
 		setIsActive((prevValue) => {
 			return false;

@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import { OutgoingTransaction, Transaction } from "../models/Transaction";
 
 interface ITransactionContext {
+	balance: number;
 	transactionList: Transaction[];
 	addTransaction?: (newTransaction: Transaction) => void;
+	getTransactionValue?: () => number;
 }
 
 const defaultState = {
+	balance: 0,
 	transactionList: [],
-	addTransaction: (newTransaction: Transaction): void => {},
 };
 
 export const TransactionContext =
@@ -47,13 +49,29 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 		useState<Transaction[]>(transactions);
 
 	const addTransaction = (newTransaction: Transaction) => {
+		console.log("Calling correct function!");
 		setTransactionList((prevValue) => [...prevValue, newTransaction]);
 	};
 
 	const deleteTransaction = (): void => {};
 
+	const getTransactionValue = () => {
+		return transactionList.reduce(
+			(prevTransaction, currentTransaction) =>
+				prevTransaction + currentTransaction.amount,
+			0
+		);
+	};
+
 	return (
-		<TransactionContext.Provider value={{ transactionList, addTransaction }}>
+		<TransactionContext.Provider
+			value={{
+				balance: 2100,
+				transactionList,
+				addTransaction,
+				getTransactionValue,
+			}}
+		>
 			{props.children}
 		</TransactionContext.Provider>
 	);

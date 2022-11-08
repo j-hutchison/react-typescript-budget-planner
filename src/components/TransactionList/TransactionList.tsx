@@ -26,8 +26,8 @@ const TransactionList = () => {
 			<h2>Expenses</h2>
 			<Searchbar />
 			<section className={classes["transaction-lines"]}>
-				{transactionList.map((transaction) => {
-					return <TransactionLine data={transaction} />;
+				{transactionList.map((transaction, key) => {
+					return <TransactionLine key={key} data={transaction} />;
 				})}
 			</section>
 		</section>

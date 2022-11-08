@@ -11,11 +11,11 @@ import AddTransaction from "./components/AddTransaction/AddTransaction";
 function App() {
 	return (
 		<div className="wrapper">
-			<Header />
 			<TransactionProvider>
+				<Header />
 				<TransactionList />
+				<AddTransaction />
 			</TransactionProvider>
-			<AddTransaction />
 		</div>
 	);
 }
