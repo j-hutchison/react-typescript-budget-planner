@@ -15,10 +15,7 @@ import classes from "./AddTransaction.module.css";
 import {
 	IncomingTransaction,
 	OutgoingTransaction,
-	Transaction,
-	TransactionType,
 } from "../../models/Transaction";
-import { IncomingMessage } from "http";
 
 const AddTransaction = () => {
 	let transactionTypeRef = useRef<string>("");

@@ -5,7 +5,9 @@ interface ITransactionContext {
 	balance: number;
 	transactionList: Transaction[];
 	addTransaction?: (newTransaction: Transaction) => void;
+	deleteTransaction?: (id: string) => void;
 	getTransactionValue?: () => number;
+	overwriteBalance?: (newBalance: number) => void;
 }
 
 const defaultState = {
@@ -45,15 +47,26 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 		transaction3,
 	] as Transaction[];
 
+	// STATE AND FUNCTIONS RELATING TO BALANCE
+	const [balance, setBalance] = useState(2100);
+	const overwriteBalance = (newBalance: number) => {
+		setBalance(() => newBalance);
+	};
+
 	const [transactionList, setTransactionList] =
 		useState<Transaction[]>(transactions);
 
 	const addTransaction = (newTransaction: Transaction) => {
-		console.log("Calling correct function!");
+		console.log("Adding new transaction");
 		setTransactionList((prevValue) => [...prevValue, newTransaction]);
 	};
 
-	const deleteTransaction = (): void => {};
+	const deleteTransaction = (id: string): void => {
+		console.log("Deleting transaction");
+		setTransactionList((prevValue) =>
+			prevValue.filter((transaction) => transaction.id !== id)
+		);
+	};
 
 	const getTransactionValue = () => {
 		return transactionList.reduce(
@@ -66,10 +79,12 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 	return (
 		<TransactionContext.Provider
 			value={{
-				balance: 2100,
+				balance,
 				transactionList,
 				addTransaction,
+				deleteTransaction,
 				getTransactionValue,
+				overwriteBalance,
 			}}
 		>
 			{props.children}

@@ -5,7 +5,8 @@ import TransactionSummaryTab from "../components/TransactionSummaryTab";
 import { TransactionContext } from "../context/TransactionContext";
 
 const Header = () => {
-	const { balance, getTransactionValue } = useContext(TransactionContext);
+	const { balance, getTransactionValue, overwriteBalance } =
+		useContext(TransactionContext);
 	const amountSpent = getTransactionValue! && getTransactionValue();
 
 	return (
@@ -17,6 +18,7 @@ const Header = () => {
 					balance={balance}
 					color="grey"
 					editable={true}
+					onEditHandler={overwriteBalance}
 				/>
 				<TransactionSummaryTab
 					title="Remaining"

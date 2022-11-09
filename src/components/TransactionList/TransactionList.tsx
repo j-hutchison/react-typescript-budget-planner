@@ -7,14 +7,6 @@ import TransactionLine from "./TransactionLine/TransactionLine";
 // Context Import
 import { TransactionContext } from "../../context/TransactionContext";
 
-// Models Import
-import {
-	TransactionType,
-	Transaction,
-	IncomingTransaction,
-	OutgoingTransaction,
-} from "../../models/Transaction";
-
 // CSS Import
 import classes from "./TransactionList.module.css";
 
