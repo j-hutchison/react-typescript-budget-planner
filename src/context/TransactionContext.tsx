@@ -8,7 +8,6 @@ interface ITransactionContext {
 	addTransaction?: (newTransaction: Transaction) => void;
 	deleteTransaction?: (id: string) => void;
 	getTransactionValue?: () => number;
-	searchTransactionsByMemo?: (memo: string) => void;
 	overwriteBalance?: (newBalance: number) => void;
 	updateSearchCriteria?: (searchText: string) => void;
 }
@@ -87,12 +86,6 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 		);
 	};
 
-	const searchTransactionsByMemo = (memo: string) => {
-		return transactionList.filter((transaction) =>
-			transaction.memo.includes(memo)
-		);
-	};
-
 	return (
 		<TransactionContext.Provider
 			value={{
@@ -102,7 +95,6 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 				addTransaction,
 				deleteTransaction,
 				getTransactionValue,
-				searchTransactionsByMemo,
 				overwriteBalance,
 				updateSearchCriteria,
 			}}

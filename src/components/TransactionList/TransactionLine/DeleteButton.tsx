@@ -1,5 +1,7 @@
 import React from "react";
 import classes from "./DeleteButton.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 interface DeleteButtonProps {
 	id: string;
@@ -16,7 +18,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = (props) => {
 
 	return (
 		<button className={classes["delete-btn"]} onClick={deleteBtnClickHandler}>
-			X
+			<FontAwesomeIcon icon={faTrash} />
 		</button>
 	);
 };

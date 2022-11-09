@@ -19,7 +19,11 @@ const TransactionList = () => {
 			<Searchbar />
 			<section className={classes["transaction-lines"]}>
 				{transactionList
-					.filter((transaction) => transaction.memo.includes(searchCriteria))
+					.filter((transaction) =>
+						transaction.memo
+							.toLowerCase()
+							.includes(searchCriteria.toLowerCase())
+					)
 					.map((transaction, key) => {
 						return <TransactionLine key={key} data={transaction} />;
 					})}

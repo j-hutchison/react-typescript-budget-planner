@@ -1,9 +1,9 @@
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import classes from "./Searchbar.module.css";
 import { TransactionContext } from "../../context/TransactionContext";
 
 const Searchbar = () => {
-	const { searchCriteria, updateSearchCriteria, searchTransactionsByMemo } =
+	const { searchCriteria, updateSearchCriteria } =
 		useContext(TransactionContext);
 
 	const onSearchChangeHandler = (

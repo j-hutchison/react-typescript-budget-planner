@@ -30,15 +30,12 @@ const AddTransaction = () => {
 
 	const onChangeTransactionTypeHandler = (type: string) => {
 		transactionTypeRef.current = type;
-		console.log(`transactionTypeRef: ${transactionTypeRef.current}`);
 	};
 	const onChangeTransactionMemoHandler = (memo: string) => {
 		transactionMemoRef.current = memo;
-		console.log(`transactionMemoRef: ${transactionMemoRef.current}`);
 	};
 	const onChangeTransactionAmountHandler = (amount: string) => {
 		transactionAmountRef.current = +amount;
-		console.log(`transactionAmountRef: ${transactionAmountRef.current}`);
 	};
 
 	const onSaveTransactionHandler = () => {
