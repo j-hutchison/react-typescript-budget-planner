@@ -23,7 +23,8 @@ const AddTransaction = () => {
 	let transactionAmountRef = useRef<number>(0);
 
 	// Destructure addTransaction function from context
-	const { addTransaction } = useContext(TransactionContext);
+	const { addTransaction, isFormSubmitted, updateIsFormSubmitted } =
+		useContext(TransactionContext);
 
 	//TODO: Fix so that values are pulled from TransactionType enum
 	const transactionTypes = [{ name: "Incoming" }, { name: "Outgoing" }];
@@ -38,7 +39,10 @@ const AddTransaction = () => {
 		transactionAmountRef.current = +amount;
 	};
 
-	const onSaveTransactionHandler = () => {
+	const onSaveTransactionHandler = (
+		event: React.FormEvent<HTMLFormElement>
+	) => {
+		event.preventDefault();
 		switch (transactionTypeRef.current) {
 			case "Incoming":
 				const newIncomingTransaction = new IncomingTransaction(
@@ -65,30 +69,34 @@ const AddTransaction = () => {
 			default:
 				throw new Error("Unexpected transaction type selected!");
 		}
+		if (!updateIsFormSubmitted) return;
+		updateIsFormSubmitted(true);
 	};
 
 	return (
 		<section className={classes["add-transaction"]}>
 			<h2>Add Transaction</h2>
-			<section className={classes["add-transaction-inputs"]}>
-				<Dropdown
-					transactionTypes={transactionTypes}
-					onChangeHandler={onChangeTransactionTypeHandler}
-				/>
-				<InputField
-					name="transaction-memo"
-					label="Name"
-					type="text"
-					onChangeHandler={onChangeTransactionMemoHandler}
-				></InputField>
-				<InputField
-					name="transaction-amount"
-					label="Amount"
-					type="number"
-					onChangeHandler={onChangeTransactionAmountHandler}
-				></InputField>
-			</section>
-			<Button text="Save" onClickHandler={onSaveTransactionHandler}></Button>
+			<form onSubmit={onSaveTransactionHandler}>
+				<section className={classes["add-transaction-inputs"]}>
+					<Dropdown
+						transactionTypes={transactionTypes}
+						onChangeHandler={onChangeTransactionTypeHandler}
+					/>
+					<InputField
+						name="transaction-memo"
+						label="Name"
+						type="text"
+						onChangeHandler={onChangeTransactionMemoHandler}
+					></InputField>
+					<InputField
+						name="transaction-amount"
+						label="Amount"
+						type="number"
+						onChangeHandler={onChangeTransactionAmountHandler}
+					></InputField>
+				</section>
+				<Button type="submit" text="Save"></Button>
+			</form>
 		</section>
 	);
 };

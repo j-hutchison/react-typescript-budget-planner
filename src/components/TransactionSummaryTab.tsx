@@ -50,6 +50,7 @@ const TransactionSummaryTab: React.FC<SummaryTabProps> = (props) => {
 
 			{props.editable && (
 				<Button
+					type={"button"}
 					text={!editEnabled ? "Edit" : "Save"}
 					onClickHandler={onEditClickHandler}
 				/>

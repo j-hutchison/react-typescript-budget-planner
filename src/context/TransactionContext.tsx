@@ -5,17 +5,20 @@ interface ITransactionContext {
 	balance: number;
 	transactionList: Transaction[];
 	searchCriteria: string;
+	isFormSubmitted: boolean;
 	addTransaction?: (newTransaction: Transaction) => void;
 	deleteTransaction?: (id: string) => void;
 	getTransactionValue?: () => number;
 	overwriteBalance?: (newBalance: number) => void;
 	updateSearchCriteria?: (searchText: string) => void;
+	updateIsFormSubmitted?: (submissionStatus: boolean) => void;
 }
 
 const defaultState = {
 	balance: 0,
 	transactionList: [],
 	searchCriteria: "",
+	isFormSubmitted: false,
 };
 
 export const TransactionContext =
@@ -63,6 +66,11 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 	};
 
 	// STATE AND FUNCTIONS RELATING TO TRANSACTIONS
+	const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+	const updateIsFormSubmitted = (submissionStatus: boolean) => {
+		setIsFormSubmitted(() => submissionStatus);
+	};
+
 	const [transactionList, setTransactionList] =
 		useState<Transaction[]>(transactions);
 
@@ -92,11 +100,13 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 				balance,
 				transactionList,
 				searchCriteria,
+				isFormSubmitted,
 				addTransaction,
 				deleteTransaction,
 				getTransactionValue,
 				overwriteBalance,
 				updateSearchCriteria,
+				updateIsFormSubmitted,
 			}}
 		>
 			{props.children}

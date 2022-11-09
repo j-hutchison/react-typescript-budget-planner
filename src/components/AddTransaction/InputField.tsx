@@ -1,4 +1,10 @@
-import React, { InputHTMLAttributes } from "react";
+import React, {
+	useRef,
+	useContext,
+	useEffect,
+	InputHTMLAttributes,
+} from "react";
+import { TransactionContext } from "../../context/TransactionContext";
 import classes from "./InputField.module.css";
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -15,6 +21,18 @@ const InputField: React.FC<InputFieldProps> = ({
 	onChangeHandler,
 	...rest
 }) => {
+	const { isFormSubmitted, updateIsFormSubmitted } =
+		useContext(TransactionContext);
+	const thisFieldRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (isFormSubmitted) {
+			thisFieldRef.current!.value = "";
+			if (!updateIsFormSubmitted) return;
+			updateIsFormSubmitted(false);
+		}
+	}, [isFormSubmitted, updateIsFormSubmitted]);
+
 	const onChangeInputValue = (event: React.FormEvent<HTMLInputElement>) => {
 		const elementValue = event.currentTarget.value;
 		onChangeHandler(elementValue);
@@ -28,6 +46,7 @@ const InputField: React.FC<InputFieldProps> = ({
 			<input
 				type={type}
 				id={name}
+				ref={thisFieldRef}
 				{...rest}
 				className={"input-border"}
 				onChange={onChangeInputValue}
