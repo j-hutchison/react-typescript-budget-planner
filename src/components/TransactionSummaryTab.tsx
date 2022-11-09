@@ -19,7 +19,7 @@ const TransactionSummaryTab: React.FC<SummaryTabProps> = (props) => {
 		if (inputRef) {
 			inputRef.current!.value = props.balance.toString();
 		}
-		if (!editEnabled) {
+		if (editEnabled) {
 			inputRef.current?.focus();
 		}
 	}, [props.balance, editEnabled]);

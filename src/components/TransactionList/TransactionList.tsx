@@ -11,16 +11,18 @@ import { TransactionContext } from "../../context/TransactionContext";
 import classes from "./TransactionList.module.css";
 
 const TransactionList = () => {
-	const { transactionList } = useContext(TransactionContext);
+	const { transactionList, searchCriteria } = useContext(TransactionContext);
 
 	return (
 		<section className={classes["transaction-list"]}>
 			<h2>Expenses</h2>
 			<Searchbar />
 			<section className={classes["transaction-lines"]}>
-				{transactionList.map((transaction, key) => {
-					return <TransactionLine key={key} data={transaction} />;
-				})}
+				{transactionList
+					.filter((transaction) => transaction.memo.includes(searchCriteria))
+					.map((transaction, key) => {
+						return <TransactionLine key={key} data={transaction} />;
+					})}
 			</section>
 		</section>
 	);

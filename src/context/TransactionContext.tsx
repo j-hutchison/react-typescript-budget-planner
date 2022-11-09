@@ -4,15 +4,19 @@ import { OutgoingTransaction, Transaction } from "../models/Transaction";
 interface ITransactionContext {
 	balance: number;
 	transactionList: Transaction[];
+	searchCriteria: string;
 	addTransaction?: (newTransaction: Transaction) => void;
 	deleteTransaction?: (id: string) => void;
 	getTransactionValue?: () => number;
+	searchTransactionsByMemo?: (memo: string) => void;
 	overwriteBalance?: (newBalance: number) => void;
+	updateSearchCriteria?: (searchText: string) => void;
 }
 
 const defaultState = {
 	balance: 0,
 	transactionList: [],
+	searchCriteria: "",
 };
 
 export const TransactionContext =
@@ -53,6 +57,13 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 		setBalance(() => newBalance);
 	};
 
+	// STATE AND FUNCTIONS RELATING TO BALANCE
+	const [searchCriteria, setSearchCriteria] = useState("");
+	const updateSearchCriteria = (searchText: string) => {
+		setSearchCriteria(() => searchText);
+	};
+
+	// STATE AND FUNCTIONS RELATING TO TRANSACTIONS
 	const [transactionList, setTransactionList] =
 		useState<Transaction[]>(transactions);
 
@@ -76,15 +87,24 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 		);
 	};
 
+	const searchTransactionsByMemo = (memo: string) => {
+		return transactionList.filter((transaction) =>
+			transaction.memo.includes(memo)
+		);
+	};
+
 	return (
 		<TransactionContext.Provider
 			value={{
 				balance,
 				transactionList,
+				searchCriteria,
 				addTransaction,
 				deleteTransaction,
 				getTransactionValue,
+				searchTransactionsByMemo,
 				overwriteBalance,
+				updateSearchCriteria,
 			}}
 		>
 			{props.children}
