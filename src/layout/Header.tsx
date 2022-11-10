@@ -5,9 +5,9 @@ import TransactionSummaryTab from "../components/TransactionSummaryTab";
 import { TransactionContext } from "../context/TransactionContext";
 
 const Header = () => {
-	const { balance, getTransactionValue, overwriteBalance } =
+	const { balance, getOverallSpend, overwriteBalance } =
 		useContext(TransactionContext);
-	const amountSpent = getTransactionValue! && getTransactionValue();
+	const amountSpent = getOverallSpend! && getOverallSpend();
 
 	return (
 		<header className={classes.wrapper}>

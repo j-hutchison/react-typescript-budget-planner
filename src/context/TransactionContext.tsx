@@ -8,7 +8,7 @@ interface ITransactionContext {
 	isFormSubmitted: boolean;
 	addTransaction?: (newTransaction: Transaction) => void;
 	deleteTransaction?: (id: string) => void;
-	getTransactionValue?: () => number;
+	getOverallSpend?: () => number;
 	overwriteBalance?: (newBalance: number) => void;
 	updateSearchCriteria?: (searchText: string) => void;
 	updateIsFormSubmitted?: (submissionStatus: boolean) => void;
@@ -33,19 +33,19 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 		"i1",
 		"Shopping",
 		50,
-		new Date()
+		new Date("11/07/2022")
 	);
 	const transaction2 = new OutgoingTransaction(
 		"i2",
 		"Holiday",
 		250,
-		new Date()
+		new Date("11/08/2022")
 	);
 	const transaction3 = new OutgoingTransaction(
 		"i3",
 		"Transporation",
 		25,
-		new Date()
+		new Date("11/9/2022")
 	);
 	const transactions = [
 		transaction1,
@@ -86,12 +86,14 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 		);
 	};
 
-	const getTransactionValue = () => {
-		return transactionList.reduce(
-			(prevTransaction, currentTransaction) =>
-				prevTransaction + currentTransaction.amount,
-			0
-		);
+	const getOverallSpend = () => {
+		return transactionList.reduce((prevTransaction, currentTransaction) => {
+			if (currentTransaction.isCredit) {
+				return prevTransaction - currentTransaction.amount;
+			} else {
+				return prevTransaction + currentTransaction.amount;
+			}
+		}, 0);
 	};
 
 	return (
@@ -103,7 +105,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 				isFormSubmitted,
 				addTransaction,
 				deleteTransaction,
-				getTransactionValue,
+				getOverallSpend,
 				overwriteBalance,
 				updateSearchCriteria,
 				updateIsFormSubmitted,

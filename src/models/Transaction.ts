@@ -9,12 +9,12 @@ export abstract class Transaction {
 		public id: string,
 		public memo: string,
 		public amount: number,
-		public date: Date
+		public date: Date,
+		public isCredit: boolean
 	) {}
 }
 
 export class IncomingTransaction extends Transaction {
-	sign: string;
 	type: TransactionType;
 
 	constructor(
@@ -23,14 +23,12 @@ export class IncomingTransaction extends Transaction {
 		public amount: number,
 		public date: Date
 	) {
-		super(id, memo, amount, date);
-		this.sign = "+";
+		super(id, memo, amount, date, true);
 		this.type = TransactionType.Incoming;
 	}
 }
 
 export class OutgoingTransaction extends Transaction {
-	sign: string;
 	type: TransactionType;
 
 	constructor(
@@ -39,8 +37,7 @@ export class OutgoingTransaction extends Transaction {
 		public amount: number,
 		public date: Date
 	) {
-		super(id, memo, amount, date);
+		super(id, memo, amount, date, false);
 		this.type = TransactionType.Outgoing;
-		this.sign = "-";
 	}
 }

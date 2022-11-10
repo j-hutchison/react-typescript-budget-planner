@@ -15,7 +15,7 @@ const TransactionList = () => {
 
 	return (
 		<section className={classes["transaction-list"]}>
-			<h2>Expenses</h2>
+			<h2>Transactions</h2>
 			<Searchbar />
 			<section className={classes["transaction-lines"]}>
 				{transactionList

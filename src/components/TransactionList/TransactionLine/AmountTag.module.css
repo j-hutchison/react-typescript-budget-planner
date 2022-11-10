@@ -12,3 +12,11 @@
 	letter-spacing: 1px;
 	color: #fff;
 }
+
+.amount-positive {
+	background-color: rgb(36, 171, 36);
+}
+
+.amount-negative {
+	background-color: rgb(252, 114, 114);
+}
