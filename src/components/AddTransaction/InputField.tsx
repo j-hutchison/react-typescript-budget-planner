@@ -21,9 +21,10 @@ const InputField: React.FC<InputFieldProps> = ({
 	onChangeHandler,
 	...rest
 }) => {
+	const thisFieldRef = useRef<HTMLInputElement>(null);
+
 	const { isFormSubmitted, updateIsFormSubmitted } =
 		useContext(TransactionContext);
-	const thisFieldRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (isFormSubmitted) {

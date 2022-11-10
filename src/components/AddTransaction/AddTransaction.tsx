@@ -15,6 +15,7 @@ import classes from "./AddTransaction.module.css";
 import {
 	IncomingTransaction,
 	OutgoingTransaction,
+	Transaction,
 } from "../../models/Transaction";
 
 const AddTransaction = () => {
@@ -23,7 +24,7 @@ const AddTransaction = () => {
 	let transactionAmountRef = useRef<number>(0);
 
 	// Destructure addTransaction function from context
-	const { addTransaction, isFormSubmitted, updateIsFormSubmitted } =
+	const { addTransaction, updateIsFormSubmitted } =
 		useContext(TransactionContext);
 
 	//TODO: Fix so that values are pulled from TransactionType enum
@@ -39,38 +40,51 @@ const AddTransaction = () => {
 		transactionAmountRef.current = +amount;
 	};
 
+	// Triggered upon clicking the save button in 'Add Transaction'
 	const onSaveTransactionHandler = (
 		event: React.FormEvent<HTMLFormElement>
 	) => {
 		event.preventDefault();
+
+		// Protects against event bubbling triggering submit
+		if (transactionMemoRef.current === "") return;
+
+		let newTransaction: Transaction;
+		const newTransactionId = (Math.random() * 10).toString();
+		const newTransactionMemo = transactionMemoRef.current;
+		const newTransactionAmount = transactionAmountRef.current;
+		const newTransactionDate = new Date();
+
 		switch (transactionTypeRef.current) {
 			case "Incoming":
-				const newIncomingTransaction = new IncomingTransaction(
-					(Math.random() * 10).toString(),
-					transactionMemoRef.current,
-					transactionAmountRef.current,
-					new Date()
+				newTransaction = new IncomingTransaction(
+					newTransactionId,
+					newTransactionMemo,
+					newTransactionAmount,
+					newTransactionDate
 				);
-				if (addTransaction) {
-					addTransaction(newIncomingTransaction);
-				}
+
 				break;
 			case "Outgoing":
-				const newOutgoingTransaction = new OutgoingTransaction(
-					(Math.random() * 10).toString(),
-					transactionMemoRef.current,
-					transactionAmountRef.current,
-					new Date()
+				newTransaction = new OutgoingTransaction(
+					newTransactionId,
+					newTransactionMemo,
+					newTransactionAmount,
+					newTransactionDate
 				);
-				if (addTransaction) {
-					addTransaction(newOutgoingTransaction);
-				}
 				break;
 			default:
 				throw new Error("Unexpected transaction type selected!");
 		}
+
+		if (!addTransaction) return;
+		addTransaction(newTransaction);
+
 		if (!updateIsFormSubmitted) return;
 		updateIsFormSubmitted(true);
+
+		transactionMemoRef.current = "";
+		transactionAmountRef.current = 0;
 	};
 
 	return (
@@ -79,7 +93,8 @@ const AddTransaction = () => {
 			<form onSubmit={onSaveTransactionHandler}>
 				<section className={classes["add-transaction-inputs"]}>
 					<Dropdown
-						transactionTypes={transactionTypes}
+						label="Transaction Type"
+						values={transactionTypes}
 						onChangeHandler={onChangeTransactionTypeHandler}
 					/>
 					<InputField

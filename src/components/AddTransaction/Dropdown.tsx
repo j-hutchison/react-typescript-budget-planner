@@ -1,56 +1,70 @@
-import React, { useState, useRef } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
+
+import { TransactionContext } from "../../context/TransactionContext";
+
 import classes from "./Dropdown.module.css";
 
 interface DropdownProps {
-	transactionTypes: { name: string }[];
+	label: string;
+	values: { name: string }[];
 	onChangeHandler: (type: string) => void;
 }
 
 const Dropdown: React.FC<DropdownProps> = (props) => {
-	const [isActive, setIsActive] = useState(false);
-
+	const [showDropdown, setShowDropdown] = useState(false);
 	//TODO use actual 'TYPES' instead of strings
-	const [transactionType, setTransactionType] = useState("");
+	const [dropdownValue, setDropdownValue] = useState("");
 
-	const transactionTypeRef = useRef<HTMLDivElement>(null);
+	const dropdownFieldRef = useRef<HTMLDivElement>(null);
+
+	const { isFormSubmitted, updateIsFormSubmitted } =
+		useContext(TransactionContext);
+
+	useEffect(() => {
+		if (isFormSubmitted) {
+			setDropdownValue(() => "");
+			setShowDropdown(() => false);
+
+			if (!updateIsFormSubmitted) return;
+			updateIsFormSubmitted(false);
+		}
+	}, [isFormSubmitted, updateIsFormSubmitted]);
 
 	const onClickDropdownHandler = (
 		event: React.MouseEvent<HTMLButtonElement>
 	) => {
-		setIsActive((prevValue) => !prevValue);
+		setShowDropdown((prevValue) => !prevValue);
 	};
 
 	const onClickDropdownOptionHandler = (
 		event: React.MouseEvent<HTMLButtonElement>
 	) => {
-		const selectedElement = event.target as HTMLInputElement;
-		setTransactionType(() => selectedElement.innerHTML);
+		const selectedOption = event.target as HTMLInputElement;
+		setDropdownValue(() => selectedOption.innerHTML);
 
-		props.onChangeHandler(selectedElement.innerHTML);
+		props.onChangeHandler(selectedOption.innerHTML);
 
-		setIsActive((prevValue) => {
-			return false;
-		});
+		setShowDropdown((prevValue) => !prevValue);
 	};
 
 	return (
 		<div className={classes["dropdown"]}>
-			<label className={classes["dropdown-label"]}>Transaction Type</label>
+			<label className={classes["dropdown-label"]}>{props.label}</label>
 			<div className={classes["dropdown-field"]}>
 				<button onClick={onClickDropdownHandler} className="input-border">
-					<div ref={transactionTypeRef} id="dropdown-field-input">
-						{transactionType ? transactionType : "Select type..."}
+					<div ref={dropdownFieldRef} id="dropdown-field-input">
+						{dropdownValue ? dropdownValue : "Select value..."}
 					</div>
 				</button>
-				{isActive && (
+				{showDropdown && (
 					<div className={`${classes["dropdown-list"]} input-border`}>
-						{props.transactionTypes.map((transactionType, i) => (
+						{props.values.map((value, i) => (
 							<button
 								key={i}
 								className={classes["dropdown-option"]}
 								onClick={onClickDropdownOptionHandler}
 							>
-								{transactionType.name}
+								{value.name}
 							</button>
 						))}
 					</div>
