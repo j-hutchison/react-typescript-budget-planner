@@ -133,6 +133,9 @@ const TransactionList = () => {
 							.toLowerCase()
 							.includes(searchCriteria.toLowerCase())
 					)
+					.sort((transactionA, transactionB) => {
+						return transactionA.date.getTime() - transactionB.date.getTime();
+					})
 					.map((transaction, key) => {
 						return <TransactionLine key={key} data={transaction} />;
 					})}

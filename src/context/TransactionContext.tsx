@@ -145,7 +145,8 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 					}
 					if (filter.name === "transaction-filter-todate") {
 						matchingTransaction =
-							matchingTransaction && new Date(transaction.date) <= filter.value;
+							matchingTransaction &&
+							new Date(transaction.date).setHours(0, 0, 0, 0) <= filter.value;
 					}
 				});
 		} else {
