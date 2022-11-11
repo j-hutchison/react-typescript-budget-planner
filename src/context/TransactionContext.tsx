@@ -1,17 +1,22 @@
 import React, { useState } from "react";
 import { OutgoingTransaction, Transaction } from "../models/Transaction";
+import { Filter } from "../models/Filter";
 
 interface ITransactionContext {
 	balance: number;
 	transactionList: Transaction[];
 	searchCriteria: string;
 	isFormSubmitted: boolean;
+	filters: Filter[];
 	addTransaction?: (newTransaction: Transaction) => void;
 	deleteTransaction?: (id: string) => void;
 	getOverallSpend?: () => number;
 	overwriteBalance?: (newBalance: number) => void;
 	updateSearchCriteria?: (searchText: string) => void;
 	updateIsFormSubmitted?: (submissionStatus: boolean) => void;
+	updateFilterFlags?: (filter: Filter, removeFilter?: boolean) => void;
+	filterByTransactionType?: (transaction: Transaction) => boolean;
+	filterByMaxMin?: (transaction: Transaction) => boolean;
 }
 
 const defaultState = {
@@ -19,6 +24,7 @@ const defaultState = {
 	transactionList: [],
 	searchCriteria: "",
 	isFormSubmitted: false,
+	filters: [],
 };
 
 export const TransactionContext =
@@ -65,6 +71,69 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 		setSearchCriteria(() => searchText);
 	};
 
+	// STATE AND FUNCTIONS RELATING TO FILTERING
+	const [filters, setFilterFlags] = useState<Filter[]>([]);
+	const updateFilterFlags = (filter: Filter, removeFilter?: boolean) => {
+		setFilterFlags((prevValue) => {
+			const existingFilters = prevValue.filter(
+				(prevfilter) => prevfilter.name !== filter.name
+			);
+			if (removeFilter) return [...existingFilters];
+			return [...existingFilters, filter];
+		});
+	};
+
+	const filterByTransactionType = (transaction: Transaction) => {
+		let matchingTransaction = false;
+		if (filters.length > 0) {
+			filters
+				.filter((filter) => filter.fieldMapping === "type")
+				.forEach((filter) => {
+					console.log(`filterByTransactionType: ${JSON.stringify(filter)}`);
+					if (filter.fieldMapping === "type") {
+						if (filter.value === "Incoming") {
+							matchingTransaction = transaction.isCredit === true;
+						} else if (filter.value === "Outgoing") {
+							matchingTransaction = transaction.isCredit === false;
+						} else {
+							matchingTransaction = true;
+						}
+					} else {
+						matchingTransaction = true;
+					}
+				});
+		} else {
+			matchingTransaction = true;
+		}
+		return matchingTransaction;
+	};
+
+	const filterByMaxMin = (transaction: Transaction) => {
+		let matchingTransaction = true;
+		if (filters.length > 0) {
+			filters
+				.filter((filter) => filter.fieldMapping === "amount")
+				.forEach((filter) => {
+					console.log(`filterByMaxMin: ${JSON.stringify(filter)}`);
+					if (filter.fieldMapping === "amount") {
+						if (filter.name === "transaction-filter-min") {
+							matchingTransaction =
+								matchingTransaction && transaction.amount >= filter.value;
+						}
+						if (filter.name === "transaction-filter-max") {
+							matchingTransaction =
+								matchingTransaction && transaction.amount <= filter.value;
+						}
+					} else {
+						matchingTransaction = true;
+					}
+				});
+		} else {
+			matchingTransaction = true;
+		}
+		return matchingTransaction;
+	};
+
 	// STATE AND FUNCTIONS RELATING TO TRANSACTIONS
 	const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 	const updateIsFormSubmitted = (submissionStatus: boolean) => {
@@ -103,12 +172,16 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 				transactionList,
 				searchCriteria,
 				isFormSubmitted,
+				filters,
 				addTransaction,
 				deleteTransaction,
 				getOverallSpend,
 				overwriteBalance,
 				updateSearchCriteria,
 				updateIsFormSubmitted,
+				updateFilterFlags,
+				filterByTransactionType,
+				filterByMaxMin,
 			}}
 		>
 			{props.children}

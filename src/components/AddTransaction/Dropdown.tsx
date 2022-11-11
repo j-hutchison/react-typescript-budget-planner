@@ -6,8 +6,9 @@ import classes from "./Dropdown.module.css";
 
 interface DropdownProps {
 	label: string;
+	fieldMapping: string;
 	values: { name: string }[];
-	onChangeHandler: (type: string) => void;
+	onChangeHandler: (name: string, fieldMapping: string, type: string) => void;
 }
 
 const Dropdown: React.FC<DropdownProps> = (props) => {
@@ -42,7 +43,11 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
 		const selectedOption = event.target as HTMLInputElement;
 		setDropdownValue(() => selectedOption.innerHTML);
 
-		props.onChangeHandler(selectedOption.innerHTML);
+		props.onChangeHandler(
+			selectedOption.innerHTML,
+			props.label,
+			props.fieldMapping
+		);
 
 		setShowDropdown((prevValue) => !prevValue);
 	};
@@ -58,6 +63,11 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
 				</button>
 				{showDropdown && (
 					<div className={`${classes["dropdown-list"]} input-border`}>
+						<button
+							key="null"
+							className={classes["dropdown-option"]}
+							onClick={onClickDropdownOptionHandler}
+						></button>
 						{props.values.map((value, i) => (
 							<button
 								key={i}

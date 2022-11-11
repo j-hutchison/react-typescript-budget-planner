@@ -11,7 +11,8 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 	name: string;
 	label: string;
 	type: string;
-	onChangeHandler: (type: string) => void;
+	onChangeHandler?: (type: string) => void;
+	onFilterHandler?: (value: string, name: string) => void;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -19,6 +20,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	label,
 	type,
 	onChangeHandler,
+	onFilterHandler,
 	...rest
 }) => {
 	const thisFieldRef = useRef<HTMLInputElement>(null);
@@ -36,7 +38,13 @@ const InputField: React.FC<InputFieldProps> = ({
 
 	const onChangeInputValue = (event: React.FormEvent<HTMLInputElement>) => {
 		const elementValue = event.currentTarget.value;
-		onChangeHandler(elementValue);
+
+		if (onChangeHandler) {
+			onChangeHandler(elementValue);
+		}
+		if (onFilterHandler) {
+			onFilterHandler(elementValue, name);
+		}
 	};
 
 	return (

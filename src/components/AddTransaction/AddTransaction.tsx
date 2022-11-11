@@ -21,6 +21,7 @@ import {
 const AddTransaction = () => {
 	let transactionTypeRef = useRef<string>("");
 	let transactionMemoRef = useRef<string>("");
+	let transactionDateRef = useRef<string>("");
 	let transactionAmountRef = useRef<number>(0);
 
 	// Destructure addTransaction function from context
@@ -39,6 +40,9 @@ const AddTransaction = () => {
 	const onChangeTransactionAmountHandler = (amount: string) => {
 		transactionAmountRef.current = +amount;
 	};
+	const onChangeTransactionDateHandler = (date: string) => {
+		transactionDateRef.current = date;
+	};
 
 	// Triggered upon clicking the save button in 'Add Transaction'
 	const onSaveTransactionHandler = (
@@ -53,7 +57,7 @@ const AddTransaction = () => {
 		const newTransactionId = (Math.random() * 10).toString();
 		const newTransactionMemo = transactionMemoRef.current;
 		const newTransactionAmount = transactionAmountRef.current;
-		const newTransactionDate = new Date();
+		const newTransactionDate = new Date(transactionDateRef.current);
 
 		switch (transactionTypeRef.current) {
 			case "Incoming":
@@ -63,7 +67,6 @@ const AddTransaction = () => {
 					newTransactionAmount,
 					newTransactionDate
 				);
-
 				break;
 			case "Outgoing":
 				newTransaction = new OutgoingTransaction(
@@ -85,6 +88,7 @@ const AddTransaction = () => {
 
 		transactionMemoRef.current = "";
 		transactionAmountRef.current = 0;
+		transactionDateRef.current = "";
 	};
 
 	return (
@@ -94,9 +98,16 @@ const AddTransaction = () => {
 				<section className={classes["add-transaction-inputs"]}>
 					<Dropdown
 						label="Transaction Type"
+						fieldMapping=""
 						values={transactionTypes}
 						onChangeHandler={onChangeTransactionTypeHandler}
 					/>
+					<InputField
+						name="transaction-date"
+						label="Date"
+						type="date"
+						onChangeHandler={onChangeTransactionDateHandler}
+					></InputField>
 					<InputField
 						name="transaction-memo"
 						label="Name"
