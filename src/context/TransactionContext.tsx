@@ -17,6 +17,7 @@ interface ITransactionContext {
 	updateFilterFlags?: (filter: Filter, removeFilter?: boolean) => void;
 	filterByTransactionType?: (transaction: Transaction) => boolean;
 	filterByMaxMin?: (transaction: Transaction) => boolean;
+	filterByFromToDate?: (transaction: Transaction) => boolean;
 }
 
 const defaultState = {
@@ -84,20 +85,16 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 	};
 
 	const filterByTransactionType = (transaction: Transaction) => {
-		let matchingTransaction = false;
+		let matchingTransaction = true;
 		if (filters.length > 0) {
 			filters
 				.filter((filter) => filter.fieldMapping === "type")
 				.forEach((filter) => {
 					console.log(`filterByTransactionType: ${JSON.stringify(filter)}`);
-					if (filter.fieldMapping === "type") {
-						if (filter.value === "Incoming") {
-							matchingTransaction = transaction.isCredit === true;
-						} else if (filter.value === "Outgoing") {
-							matchingTransaction = transaction.isCredit === false;
-						} else {
-							matchingTransaction = true;
-						}
+					if (filter.value === "Incoming") {
+						matchingTransaction = transaction.isCredit === true;
+					} else if (filter.value === "Outgoing") {
+						matchingTransaction = transaction.isCredit === false;
 					} else {
 						matchingTransaction = true;
 					}
@@ -115,17 +112,40 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 				.filter((filter) => filter.fieldMapping === "amount")
 				.forEach((filter) => {
 					console.log(`filterByMaxMin: ${JSON.stringify(filter)}`);
-					if (filter.fieldMapping === "amount") {
-						if (filter.name === "transaction-filter-min") {
-							matchingTransaction =
-								matchingTransaction && transaction.amount >= filter.value;
-						}
-						if (filter.name === "transaction-filter-max") {
-							matchingTransaction =
-								matchingTransaction && transaction.amount <= filter.value;
-						}
-					} else {
-						matchingTransaction = true;
+					if (filter.name === "transaction-filter-min") {
+						matchingTransaction =
+							matchingTransaction && transaction.amount >= filter.value;
+					}
+					if (filter.name === "transaction-filter-max") {
+						matchingTransaction =
+							matchingTransaction && transaction.amount <= filter.value;
+					}
+				});
+		} else {
+			matchingTransaction = true;
+		}
+		return matchingTransaction;
+	};
+
+	const filterByFromToDate = (transaction: Transaction) => {
+		console.log(`filterByFromToDate`);
+		let matchingTransaction = true;
+		if (filters.length > 0) {
+			filters
+				.filter((filter) => filter.fieldMapping === "date")
+				.forEach((filter) => {
+					console.log(`filterByFromToDate: ${JSON.stringify(filter)}`);
+
+					console.log(new Date(transaction.date));
+					console.log(filter.value);
+
+					if (filter.name === "transaction-filter-fromdate") {
+						matchingTransaction =
+							matchingTransaction && new Date(transaction.date) >= filter.value;
+					}
+					if (filter.name === "transaction-filter-todate") {
+						matchingTransaction =
+							matchingTransaction && new Date(transaction.date) <= filter.value;
 					}
 				});
 		} else {
@@ -182,6 +202,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 				updateFilterFlags,
 				filterByTransactionType,
 				filterByMaxMin,
+				filterByFromToDate,
 			}}
 		>
 			{props.children}

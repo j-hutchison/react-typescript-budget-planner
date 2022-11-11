@@ -23,6 +23,7 @@ const TransactionList = () => {
 		updateFilterFlags,
 		filterByTransactionType,
 		filterByMaxMin,
+		filterByFromToDate,
 	} = useContext(TransactionContext);
 
 	//TODO: Fix so that values are pulled from TransactionType enum
@@ -59,12 +60,29 @@ const TransactionList = () => {
 		}
 	};
 
+	const onChangeFromToDateFilterHandler = (value: string, name: string) => {
+		const thisFilter = new Filter(
+			name,
+			"date",
+			new Date(value).setHours(0, 0, 0, 0)
+		);
+		console.log(value, name);
+
+		if (!updateFilterFlags) return;
+		if (value === "") {
+			updateFilterFlags(thisFilter, true);
+		} else {
+			updateFilterFlags(thisFilter);
+		}
+	};
+
 	return (
 		<section className={classes["transaction-list"]}>
 			<h2>Transactions</h2>
 			<Searchbar />
 
 			<div className={classes["filters"]}>
+				<h3>Filters</h3>
 				<Dropdown
 					label="Transaction Type"
 					fieldMapping="type"
@@ -83,6 +101,18 @@ const TransactionList = () => {
 					type="number"
 					onFilterHandler={onChangeMaxMinFilterHandler}
 				></InputField>
+				<InputField
+					name="transaction-filter-fromdate"
+					label="Date (from)"
+					type="date"
+					onFilterHandler={onChangeFromToDateFilterHandler}
+				></InputField>
+				<InputField
+					name="transaction-filter-todate"
+					label="Date (to)"
+					type="date"
+					onFilterHandler={onChangeFromToDateFilterHandler}
+				></InputField>
 			</div>
 			<section className={classes["transaction-lines"]}>
 				{transactionList
@@ -93,6 +123,10 @@ const TransactionList = () => {
 					.filter((transaction) => {
 						if (!filterByMaxMin) return true;
 						return filterByMaxMin(transaction);
+					})
+					.filter((transaction) => {
+						if (!filterByFromToDate) return true;
+						return filterByFromToDate(transaction);
 					})
 					.filter((transaction) =>
 						transaction.memo

@@ -1,11 +1,11 @@
 .dropdown {
+	grid-column: 1 / 3;
+
 	display: flex;
 	flex-direction: column;
 
 	flex-grow: 1;
 	gap: 0.5rem;
-
-	max-width: 50%;
 }
 .dropdown > span {
 	display: block;
