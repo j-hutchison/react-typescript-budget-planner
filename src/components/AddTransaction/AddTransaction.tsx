@@ -52,12 +52,14 @@ const AddTransaction = () => {
 
 		// Protects against event bubbling triggering submit
 		if (transactionMemoRef.current === "") return;
+		let transactionDateCleansed = new Date(transactionDateRef.current);
+		transactionDateCleansed.setHours(0, 0, 0, 0);
 
 		let newTransaction: Transaction;
 		const newTransactionId = (Math.random() * 10).toString();
 		const newTransactionMemo = transactionMemoRef.current;
 		const newTransactionAmount = transactionAmountRef.current;
-		const newTransactionDate = new Date(transactionDateRef.current);
+		const newTransactionDate = transactionDateCleansed;
 
 		switch (transactionTypeRef.current) {
 			case "Incoming":
@@ -72,7 +74,7 @@ const AddTransaction = () => {
 				newTransaction = new OutgoingTransaction(
 					newTransactionId,
 					newTransactionMemo,
-					newTransactionAmount,
+					newTransactionAmount * -1,
 					newTransactionDate
 				);
 				break;

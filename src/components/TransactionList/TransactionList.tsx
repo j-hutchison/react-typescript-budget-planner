@@ -4,6 +4,7 @@ import React, { useContext, useRef } from "react";
 import Searchbar from "./Searchbar";
 import TransactionLine from "./TransactionLine/TransactionLine";
 import InputField from "../AddTransaction/InputField";
+import SummaryLine from "./SummaryLine/SummaryLine";
 
 // Context Import
 import { TransactionContext } from "../../context/TransactionContext";
@@ -16,6 +17,8 @@ import Dropdown from "../AddTransaction/Dropdown";
 
 const TransactionList = () => {
 	const transactionTypeFilterRef = useRef(false);
+	const transactionDateFromRef = useRef<Date>();
+	const transactionDateToRef = useRef<Date>();
 
 	const {
 		transactionList,
@@ -24,6 +27,7 @@ const TransactionList = () => {
 		filterByTransactionType,
 		filterByMaxMin,
 		filterByFromToDate,
+		getBalanceAsOfDate,
 	} = useContext(TransactionContext);
 
 	//TODO: Fix so that values are pulled from TransactionType enum
@@ -61,18 +65,25 @@ const TransactionList = () => {
 	};
 
 	const onChangeFromToDateFilterHandler = (value: string, name: string) => {
-		const thisFilter = new Filter(
-			name,
-			"date",
-			new Date(value).setHours(0, 0, 0, 0)
-		);
+		let cleansedDate = new Date(value);
+		cleansedDate.setHours(0, 0, 0, 0);
+
+		const thisFilter = new Filter(name, "date", cleansedDate);
 		console.log(value, name);
 
+		// manage the filter object in context
 		if (!updateFilterFlags) return;
 		if (value === "") {
 			updateFilterFlags(thisFilter, true);
 		} else {
 			updateFilterFlags(thisFilter);
+		}
+
+		//
+		if (name.includes("todate")) {
+			transactionDateToRef.current = cleansedDate;
+		} else if (name.includes("fromdate")) {
+			transactionDateFromRef.current = cleansedDate;
 		}
 	};
 
@@ -115,6 +126,15 @@ const TransactionList = () => {
 				></InputField>
 			</div>
 			<section className={classes["transaction-lines"]}>
+				<SummaryLine
+					isOpeningBalance={true}
+					balance={
+						getBalanceAsOfDate
+							? getBalanceAsOfDate(transactionDateFromRef.current!, "from")
+							: 0
+					}
+					editable={false}
+				/>
 				{transactionList
 					.filter((transaction) => {
 						if (!filterByTransactionType) return true;
@@ -139,6 +159,15 @@ const TransactionList = () => {
 					.map((transaction, key) => {
 						return <TransactionLine key={key} data={transaction} />;
 					})}
+				<SummaryLine
+					isOpeningBalance={false}
+					balance={
+						getBalanceAsOfDate
+							? getBalanceAsOfDate(transactionDateToRef.current!, "to")
+							: 0
+					}
+					editable={false}
+				/>
 			</section>
 		</section>
 	);

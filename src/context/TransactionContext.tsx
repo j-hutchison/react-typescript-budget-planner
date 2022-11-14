@@ -4,6 +4,7 @@ import { Filter } from "../models/Filter";
 
 interface ITransactionContext {
 	balance: number;
+	minBalance: number;
 	transactionList: Transaction[];
 	searchCriteria: string;
 	isFormSubmitted: boolean;
@@ -11,10 +12,13 @@ interface ITransactionContext {
 	addTransaction?: (newTransaction: Transaction) => void;
 	deleteTransaction?: (id: string) => void;
 	getOverallSpend?: () => number;
+	getBalanceAsOfDate?: (date: Date, fromTo: "from" | "to") => number;
 	overwriteBalance?: (newBalance: number) => void;
+	overwriteMinBalance?: (newBalance: number) => void;
 	updateSearchCriteria?: (searchText: string) => void;
 	updateIsFormSubmitted?: (submissionStatus: boolean) => void;
 	updateFilterFlags?: (filter: Filter, removeFilter?: boolean) => void;
+	getDateFilters?: () => Filter[];
 	filterByTransactionType?: (transaction: Transaction) => boolean;
 	filterByMaxMin?: (transaction: Transaction) => boolean;
 	filterByFromToDate?: (transaction: Transaction) => boolean;
@@ -22,6 +26,7 @@ interface ITransactionContext {
 
 const defaultState = {
 	balance: 0,
+	minBalance: 0,
 	transactionList: [],
 	searchCriteria: "",
 	isFormSubmitted: false,
@@ -39,19 +44,19 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 	const transaction1 = new OutgoingTransaction(
 		"i1",
 		"Shopping",
-		50,
+		-50,
 		new Date("11/07/2022")
 	);
 	const transaction2 = new OutgoingTransaction(
 		"i2",
 		"Holiday",
-		250,
+		-250,
 		new Date("11/08/2022")
 	);
 	const transaction3 = new OutgoingTransaction(
 		"i3",
 		"Transporation",
-		25,
+		-25,
 		new Date("11/9/2022")
 	);
 	const transactions = [
@@ -64,6 +69,12 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 	const [balance, setBalance] = useState(2100);
 	const overwriteBalance = (newBalance: number) => {
 		setBalance(() => newBalance);
+	};
+
+	// STATE AND FUNCTIONS RELATING TO BALANCE
+	const [minBalance, setMinBalance] = useState(0);
+	const overwriteMinBalance = (newBalance: number) => {
+		setMinBalance(() => newBalance);
 	};
 
 	// STATE AND FUNCTIONS RELATING TO BALANCE
@@ -114,11 +125,13 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 					console.log(`filterByMaxMin: ${JSON.stringify(filter)}`);
 					if (filter.name === "transaction-filter-min") {
 						matchingTransaction =
-							matchingTransaction && transaction.amount >= filter.value;
+							matchingTransaction &&
+							Math.abs(transaction.amount) >= filter.value;
 					}
 					if (filter.name === "transaction-filter-max") {
 						matchingTransaction =
-							matchingTransaction && transaction.amount <= filter.value;
+							matchingTransaction &&
+							Math.abs(transaction.amount) <= filter.value;
 					}
 				});
 		} else {
@@ -155,6 +168,14 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 		return matchingTransaction;
 	};
 
+	const getDateFilters = (): Filter[] => {
+		return filters.filter(
+			(filter) =>
+				filter.name === "transaction-filter-fromdate" ||
+				filter.name === "transaction-filter-todate"
+		);
+	};
+
 	// STATE AND FUNCTIONS RELATING TO TRANSACTIONS
 	const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 	const updateIsFormSubmitted = (submissionStatus: boolean) => {
@@ -178,18 +199,77 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 
 	const getOverallSpend = () => {
 		return transactionList.reduce((prevTransaction, currentTransaction) => {
-			if (currentTransaction.isCredit) {
-				return prevTransaction - currentTransaction.amount;
-			} else {
-				return prevTransaction + currentTransaction.amount;
-			}
+			// if (currentTransaction.isCredit) {
+			// 	return prevTransaction - currentTransaction.amount;
+			// } else {
+			return prevTransaction + currentTransaction.amount;
+			// }
 		}, 0);
+	};
+
+	const getBalanceAsOfDate = (date: Date, fromTo: "from" | "to"): number => {
+		let result = 0;
+
+		console.log(date);
+		if (fromTo === "from") {
+			const filteredTransctions = transactionList.filter(
+				(transaction) => transaction.date < date
+			);
+
+			if (filteredTransctions.length === 0) return balance;
+
+			const filteredTransactionAmount = filteredTransctions.reduce(
+				(previousTransaction, currentTransaction) => {
+					console.log(currentTransaction.amount);
+
+					if (currentTransaction.amount > 0) {
+						return previousTransaction + currentTransaction.amount;
+					}
+					return previousTransaction - Math.abs(currentTransaction.amount);
+				},
+				0
+			);
+
+			console.log(filteredTransactionAmount);
+			result =
+				filteredTransactionAmount > 0
+					? balance + filteredTransactionAmount
+					: balance - Math.abs(filteredTransactionAmount);
+		}
+		if (fromTo === "to") {
+			const filteredTransctions = transactionList.filter(
+				(transaction) => transaction.date <= date
+			);
+
+			if (filteredTransctions.length === 0) return balance + getOverallSpend();
+
+			const filteredTransactionAmount = filteredTransctions.reduce(
+				(previousTransaction, currentTransaction) => {
+					console.log(currentTransaction.amount);
+					if (currentTransaction.amount > 0) {
+						return previousTransaction + currentTransaction.amount;
+					}
+					return previousTransaction - Math.abs(currentTransaction.amount);
+				},
+				0
+			);
+
+			console.log(filteredTransactionAmount);
+
+			result =
+				filteredTransactionAmount > 0
+					? balance + filteredTransactionAmount
+					: balance - Math.abs(filteredTransactionAmount);
+		}
+
+		return result;
 	};
 
 	return (
 		<TransactionContext.Provider
 			value={{
 				balance,
+				minBalance,
 				transactionList,
 				searchCriteria,
 				isFormSubmitted,
@@ -197,13 +277,16 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 				addTransaction,
 				deleteTransaction,
 				getOverallSpend,
+				getBalanceAsOfDate,
 				overwriteBalance,
+				overwriteMinBalance,
 				updateSearchCriteria,
 				updateIsFormSubmitted,
 				updateFilterFlags,
 				filterByTransactionType,
 				filterByMaxMin,
 				filterByFromToDate,
+				getDateFilters,
 			}}
 		>
 			{props.children}

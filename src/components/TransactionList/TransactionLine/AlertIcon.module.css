@@ -1,0 +1,33 @@
+.alert {
+	border: none;
+	color: var(---warning-red);
+	font-size: 1.6rem;
+
+	position: relative;
+}
+
+.alert:hover {
+	color: red;
+	cursor: pointer;
+	transition: color 0.3s;
+}
+
+.alert-tooltip {
+	visibility: hidden;
+	min-width: 20rem;
+	font-size: 1.3rem;
+
+	background-color: rgb(224, 203, 203);
+	color: var(---warning-red);
+	text-align: center;
+	border-radius: 3px;
+	padding: 1rem;
+
+	/* Position the tooltip */
+	position: absolute;
+	z-index: 1;
+}
+
+.alert:hover .alert-tooltip {
+	visibility: visible;
+}

@@ -13,7 +13,9 @@ const AmountTag: React.FC<AmountTagProps> = (props) => {
 				props.isCredit ? classes["amount-positive"] : classes["amount-negative"]
 			}`}
 		>
-			<span className={classes["amount-tag-value"]}>€{props.amount}</span>
+			<span className={classes["amount-tag-value"]}>
+				€{Math.abs(props.amount)}
+			</span>
 		</div>
 	);
 };
