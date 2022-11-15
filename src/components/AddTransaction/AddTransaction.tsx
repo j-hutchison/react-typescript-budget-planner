@@ -79,12 +79,13 @@ const AddTransaction = () => {
 		const transactionDateArray = [newTransactionDate];
 
 		// CREATE TRANSACTIONS MAX UNTIL END OF NEXT YEAR
-		let MAX_MONTHS = monthDiff(
-			new Date(),
-			new Date(new Date().getFullYear() + 1, 11, 31)
-		);
+		let MAX_MONTHS =
+			monthDiff(
+				newTransactionDate,
+				new Date(newTransactionDate.getFullYear() + 1, 11, 31)
+			) - 1;
 
-		console.log(MAX_MONTHS);
+		console.log(`MAX_MONTHS: ${MAX_MONTHS}`);
 
 		const nextTransactionDate = new Date(
 			newTransactionDate.getFullYear(),
@@ -93,17 +94,18 @@ const AddTransaction = () => {
 		);
 
 		console.log(nextTransactionDate);
-		const dt = DateTime.local();
 
 		while (MAX_MONTHS > 0) {
 			let thisTransactionDate = DateTime.fromJSDate(nextTransactionDate).plus({
 				months: MAX_MONTHS,
 			});
-
-			console.log(thisTransactionDate.toLocaleString());
-			transactionDateArray.push(thisTransactionDate.toJSDate());
-
+			console.log(
+				`thisTransactionDate: ${thisTransactionDate.toLocaleString()}`
+			);
 			MAX_MONTHS -= recurringMonthRef.current!;
+			console.log(`MAX_MONTHS UPDATED: ${MAX_MONTHS}`);
+
+			transactionDateArray.push(thisTransactionDate.toJSDate());
 		}
 		return transactionDateArray;
 	};
@@ -120,7 +122,6 @@ const AddTransaction = () => {
 		transactionDateCleansed.setHours(0, 0, 0, 0);
 
 		let newTransaction: Transaction[];
-		const newTransactionId = (Math.random() * 10).toString();
 		const newTransactionMemo = transactionMemoRef.current;
 		const newTransactionAmount = transactionAmountRef.current;
 		const newTransactionDate = transactionDateCleansed;
@@ -136,7 +137,7 @@ const AddTransaction = () => {
 				newTransaction = transactionSchedule.map(
 					(date) =>
 						new IncomingTransaction(
-							newTransactionId,
+							(Math.random() * 10).toString(),
 							newTransactionMemo,
 							newTransactionAmount,
 							date
@@ -147,7 +148,7 @@ const AddTransaction = () => {
 				newTransaction = transactionSchedule.map(
 					(date) =>
 						new OutgoingTransaction(
-							newTransactionId,
+							(Math.random() * 10).toString(),
 							newTransactionMemo,
 							newTransactionAmount * -1,
 							date
