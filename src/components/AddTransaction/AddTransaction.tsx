@@ -4,6 +4,7 @@ import React, { useContext, useRef } from "react";
 import { TransactionContext } from "../../context/TransactionContext";
 
 // Import Components
+import AdvancedInputOptions from "./AdvancedInputOptions";
 import Dropdown from "./Dropdown";
 import InputField from "./InputField";
 import Button from "../Button";
@@ -18,15 +19,24 @@ import {
 	Transaction,
 } from "../../models/Transaction";
 
+import { DateTime } from "luxon";
+
 const AddTransaction = () => {
 	let transactionTypeRef = useRef<string>("");
 	let transactionMemoRef = useRef<string>("");
 	let transactionDateRef = useRef<string>("");
 	let transactionAmountRef = useRef<number>(0);
 
+	let recurringDayRef = useRef<number>();
+	let recurringMonthRef = useRef<number>();
+
 	// Destructure addTransaction function from context
-	const { addTransaction, updateIsFormSubmitted } =
-		useContext(TransactionContext);
+	const {
+		addTransaction,
+		updateIsFormSubmitted,
+		isTransactionRecurring,
+		toggleIsTransactionRecurring,
+	} = useContext(TransactionContext);
 
 	//TODO: Fix so that values are pulled from TransactionType enum
 	const transactionTypes = [{ name: "Incoming" }, { name: "Outgoing" }];
@@ -44,6 +54,60 @@ const AddTransaction = () => {
 		transactionDateRef.current = date;
 	};
 
+	const onToggleTransactionIsRecurring = (isRecurring: boolean) => {
+		if (!toggleIsTransactionRecurring) return;
+		toggleIsTransactionRecurring(isRecurring);
+	};
+
+	const onChangeAdvancedOptions = (
+		day: number,
+		monthRepetition: number
+	): void => {
+		recurringDayRef.current = day;
+		recurringMonthRef.current = monthRepetition;
+	};
+
+	const monthDiff = (dateFrom: Date, dateTo: Date): number => {
+		return (
+			dateTo.getMonth() -
+			dateFrom.getMonth() +
+			12 * (dateTo.getFullYear() - dateFrom.getFullYear())
+		);
+	};
+
+	const buildTransactionSchedule = (newTransactionDate: Date): Date[] => {
+		const transactionDateArray = [newTransactionDate];
+
+		// CREATE TRANSACTIONS MAX UNTIL END OF NEXT YEAR
+		let MAX_MONTHS = monthDiff(
+			new Date(),
+			new Date(new Date().getFullYear() + 1, 11, 31)
+		);
+
+		console.log(MAX_MONTHS);
+
+		const nextTransactionDate = new Date(
+			newTransactionDate.getFullYear(),
+			newTransactionDate.getMonth(),
+			recurringDayRef.current!
+		);
+
+		console.log(nextTransactionDate);
+		const dt = DateTime.local();
+
+		while (MAX_MONTHS > 0) {
+			let thisTransactionDate = DateTime.fromJSDate(nextTransactionDate).plus({
+				months: MAX_MONTHS,
+			});
+
+			console.log(thisTransactionDate.toLocaleString());
+			transactionDateArray.push(thisTransactionDate.toJSDate());
+
+			MAX_MONTHS -= recurringMonthRef.current!;
+		}
+		return transactionDateArray;
+	};
+
 	// Triggered upon clicking the save button in 'Add Transaction'
 	const onSaveTransactionHandler = (
 		event: React.FormEvent<HTMLFormElement>
@@ -55,27 +119,39 @@ const AddTransaction = () => {
 		let transactionDateCleansed = new Date(transactionDateRef.current);
 		transactionDateCleansed.setHours(0, 0, 0, 0);
 
-		let newTransaction: Transaction;
+		let newTransaction: Transaction[];
 		const newTransactionId = (Math.random() * 10).toString();
 		const newTransactionMemo = transactionMemoRef.current;
 		const newTransactionAmount = transactionAmountRef.current;
 		const newTransactionDate = transactionDateCleansed;
 
+		const transactionSchedule = isTransactionRecurring
+			? buildTransactionSchedule(newTransactionDate)
+			: [newTransactionDate];
+
+		console.log(transactionSchedule);
+
 		switch (transactionTypeRef.current) {
 			case "Incoming":
-				newTransaction = new IncomingTransaction(
-					newTransactionId,
-					newTransactionMemo,
-					newTransactionAmount,
-					newTransactionDate
+				newTransaction = transactionSchedule.map(
+					(date) =>
+						new IncomingTransaction(
+							newTransactionId,
+							newTransactionMemo,
+							newTransactionAmount,
+							date
+						)
 				);
 				break;
 			case "Outgoing":
-				newTransaction = new OutgoingTransaction(
-					newTransactionId,
-					newTransactionMemo,
-					newTransactionAmount * -1,
-					newTransactionDate
+				newTransaction = transactionSchedule.map(
+					(date) =>
+						new OutgoingTransaction(
+							newTransactionId,
+							newTransactionMemo,
+							newTransactionAmount * -1,
+							date
+						)
 				);
 				break;
 			default:
@@ -110,6 +186,7 @@ const AddTransaction = () => {
 						type="date"
 						onChangeHandler={onChangeTransactionDateHandler}
 					></InputField>
+
 					<InputField
 						name="transaction-memo"
 						label="Name"
@@ -122,7 +199,18 @@ const AddTransaction = () => {
 						type="number"
 						onChangeHandler={onChangeTransactionAmountHandler}
 					></InputField>
+					<InputField
+						name="transaction-recurring"
+						label="Make recurring"
+						type="checkbox"
+						onToggleHandler={onToggleTransactionIsRecurring}
+					></InputField>
 				</section>
+				{isTransactionRecurring && (
+					<AdvancedInputOptions
+						onChangeAdvancedOptions={onChangeAdvancedOptions}
+					/>
+				)}
 				<Button type="submit" text="Save"></Button>
 			</form>
 		</section>

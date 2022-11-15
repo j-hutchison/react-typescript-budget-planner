@@ -13,6 +13,7 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 	type: string;
 	onChangeHandler?: (type: string) => void;
 	onFilterHandler?: (value: string, name: string) => void;
+	onToggleHandler?: (value: boolean) => void;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -21,6 +22,7 @@ const InputField: React.FC<InputFieldProps> = ({
 	type,
 	onChangeHandler,
 	onFilterHandler,
+	onToggleHandler,
 	...rest
 }) => {
 	const thisFieldRef = useRef<HTMLInputElement>(null);
@@ -44,6 +46,9 @@ const InputField: React.FC<InputFieldProps> = ({
 		}
 		if (onFilterHandler) {
 			onFilterHandler(elementValue, name);
+		}
+		if (onToggleHandler) {
+			onToggleHandler(event.currentTarget.checked);
 		}
 	};
 

@@ -8,8 +8,9 @@ interface ITransactionContext {
 	transactionList: Transaction[];
 	searchCriteria: string;
 	isFormSubmitted: boolean;
+	isTransactionRecurring: boolean;
 	filters: Filter[];
-	addTransaction?: (newTransaction: Transaction) => void;
+	addTransaction?: (newTransaction: Transaction[]) => void;
 	deleteTransaction?: (id: string) => void;
 	getOverallSpend?: () => number;
 	getBalanceAsOfDate?: (date: Date, fromTo: "from" | "to") => number;
@@ -18,6 +19,7 @@ interface ITransactionContext {
 	updateSearchCriteria?: (searchText: string) => void;
 	updateIsFormSubmitted?: (submissionStatus: boolean) => void;
 	updateFilterFlags?: (filter: Filter, removeFilter?: boolean) => void;
+	toggleIsTransactionRecurring?: (value: boolean) => void;
 	getDateFilters?: () => Filter[];
 	filterByTransactionType?: (transaction: Transaction) => boolean;
 	filterByMaxMin?: (transaction: Transaction) => boolean;
@@ -30,6 +32,7 @@ const defaultState = {
 	transactionList: [],
 	searchCriteria: "",
 	isFormSubmitted: false,
+	isTransactionRecurring: false,
 	filters: [],
 };
 
@@ -101,7 +104,6 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 			filters
 				.filter((filter) => filter.fieldMapping === "type")
 				.forEach((filter) => {
-					console.log(`filterByTransactionType: ${JSON.stringify(filter)}`);
 					if (filter.value === "Incoming") {
 						matchingTransaction = transaction.isCredit === true;
 					} else if (filter.value === "Outgoing") {
@@ -122,7 +124,6 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 			filters
 				.filter((filter) => filter.fieldMapping === "amount")
 				.forEach((filter) => {
-					console.log(`filterByMaxMin: ${JSON.stringify(filter)}`);
 					if (filter.name === "transaction-filter-min") {
 						matchingTransaction =
 							matchingTransaction &&
@@ -141,17 +142,11 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 	};
 
 	const filterByFromToDate = (transaction: Transaction) => {
-		console.log(`filterByFromToDate`);
 		let matchingTransaction = true;
 		if (filters.length > 0) {
 			filters
 				.filter((filter) => filter.fieldMapping === "date")
 				.forEach((filter) => {
-					console.log(`filterByFromToDate: ${JSON.stringify(filter)}`);
-
-					console.log(new Date(transaction.date));
-					console.log(filter.value);
-
 					if (filter.name === "transaction-filter-fromdate") {
 						matchingTransaction =
 							matchingTransaction && new Date(transaction.date) >= filter.value;
@@ -163,7 +158,9 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 					}
 				});
 		} else {
-			matchingTransaction = true;
+			const compareDate = new Date(new Date().getFullYear() + 1, 11, 31);
+			matchingTransaction =
+				matchingTransaction && transaction.date <= compareDate;
 		}
 		return matchingTransaction;
 	};
@@ -185,9 +182,14 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 	const [transactionList, setTransactionList] =
 		useState<Transaction[]>(transactions);
 
-	const addTransaction = (newTransaction: Transaction) => {
+	const addTransaction = (newTransaction: Transaction[]) => {
 		console.log("Adding new transaction");
-		setTransactionList((prevValue) => [...prevValue, newTransaction]);
+
+		if (Array.isArray(newTransaction)) {
+			setTransactionList((prevValue) => [...prevValue, ...newTransaction]);
+		} else {
+			setTransactionList((prevValue) => [...prevValue, newTransaction]);
+		}
 	};
 
 	const deleteTransaction = (id: string): void => {
@@ -199,18 +201,13 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 
 	const getOverallSpend = () => {
 		return transactionList.reduce((prevTransaction, currentTransaction) => {
-			// if (currentTransaction.isCredit) {
-			// 	return prevTransaction - currentTransaction.amount;
-			// } else {
 			return prevTransaction + currentTransaction.amount;
-			// }
 		}, 0);
 	};
 
 	const getBalanceAsOfDate = (date: Date, fromTo: "from" | "to"): number => {
 		let result = 0;
 
-		console.log(date);
 		if (fromTo === "from") {
 			const filteredTransctions = transactionList.filter(
 				(transaction) => transaction.date < date
@@ -220,8 +217,6 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 
 			const filteredTransactionAmount = filteredTransctions.reduce(
 				(previousTransaction, currentTransaction) => {
-					console.log(currentTransaction.amount);
-
 					if (currentTransaction.amount > 0) {
 						return previousTransaction + currentTransaction.amount;
 					}
@@ -230,7 +225,6 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 				0
 			);
 
-			console.log(filteredTransactionAmount);
 			result =
 				filteredTransactionAmount > 0
 					? balance + filteredTransactionAmount
@@ -245,7 +239,6 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 
 			const filteredTransactionAmount = filteredTransctions.reduce(
 				(previousTransaction, currentTransaction) => {
-					console.log(currentTransaction.amount);
 					if (currentTransaction.amount > 0) {
 						return previousTransaction + currentTransaction.amount;
 					}
@@ -253,8 +246,6 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 				},
 				0
 			);
-
-			console.log(filteredTransactionAmount);
 
 			result =
 				filteredTransactionAmount > 0
@@ -265,6 +256,10 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 		return result;
 	};
 
+	const [isTransactionRecurring, setIsTransactionRecurring] = useState(false);
+	const toggleIsTransactionRecurring = (value: boolean) =>
+		setIsTransactionRecurring(() => value);
+
 	return (
 		<TransactionContext.Provider
 			value={{
@@ -273,6 +268,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 				transactionList,
 				searchCriteria,
 				isFormSubmitted,
+				isTransactionRecurring,
 				filters,
 				addTransaction,
 				deleteTransaction,
@@ -283,6 +279,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 				updateSearchCriteria,
 				updateIsFormSubmitted,
 				updateFilterFlags,
+				toggleIsTransactionRecurring,
 				filterByTransactionType,
 				filterByMaxMin,
 				filterByFromToDate,

@@ -11,13 +11,12 @@ import { TransactionContext } from "../../../context/TransactionContext";
 
 // CSS Import
 import classes from "./TransactionLine.module.css";
-import { spawn } from "child_process";
 interface TransactionLineProps {
 	data: Transaction;
 }
 
 const TransactionLine: React.FC<TransactionLineProps> = ({ data }) => {
-	const { deleteTransaction, balance, getBalanceAsOfDate, minBalance } =
+	const { deleteTransaction, getBalanceAsOfDate, minBalance } =
 		useContext(TransactionContext);
 
 	return (
