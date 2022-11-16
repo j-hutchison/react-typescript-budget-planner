@@ -177,6 +177,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 	const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 	const updateIsFormSubmitted = (submissionStatus: boolean) => {
 		setIsFormSubmitted(() => submissionStatus);
+		setIsTransactionRecurring(() => false);
 	};
 
 	const [transactionList, setTransactionList] =

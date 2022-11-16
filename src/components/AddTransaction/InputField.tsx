@@ -32,9 +32,13 @@ const InputField: React.FC<InputFieldProps> = ({
 
 	useEffect(() => {
 		if (isFormSubmitted) {
-			thisFieldRef.current!.value = "";
-			if (!updateIsFormSubmitted) return;
-			updateIsFormSubmitted(false);
+			console.log(onFilterHandler);
+			if (!onFilterHandler) {
+				thisFieldRef.current!.value = "";
+				thisFieldRef.current!.checked = false;
+				if (!updateIsFormSubmitted) return;
+				updateIsFormSubmitted(false);
+			}
 		}
 	}, [isFormSubmitted, updateIsFormSubmitted]);
 

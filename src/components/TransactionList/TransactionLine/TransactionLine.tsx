@@ -21,7 +21,7 @@ const TransactionLine: React.FC<TransactionLineProps> = ({ data }) => {
 
 	return (
 		<div className={classes["transaction-line"]}>
-			<span className={classes["t-line-memo"]}>{data.date.toDateString()}</span>
+			<span className={classes["t-line-date"]}>{data.date.toDateString()}</span>
 			<span className={classes["t-line-memo"]}>{data.memo}</span>
 			<div className={classes["t-line-cta"]}>
 				{getBalanceAsOfDate &&

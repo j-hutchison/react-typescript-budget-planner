@@ -8,6 +8,7 @@ interface DropdownProps {
 	label: string;
 	fieldMapping: string;
 	values: { name: string }[];
+	isFilter?: boolean;
 	onChangeHandler: (name: string, fieldMapping: string, type: string) => void;
 }
 
@@ -23,11 +24,13 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
 
 	useEffect(() => {
 		if (isFormSubmitted) {
-			setDropdownValue(() => "");
-			setShowDropdown(() => false);
+			if (!props.isFilter) {
+				setDropdownValue(() => "");
+				setShowDropdown(() => false);
 
-			if (!updateIsFormSubmitted) return;
-			updateIsFormSubmitted(false);
+				if (!updateIsFormSubmitted) return;
+				updateIsFormSubmitted(false);
+			}
 		}
 	}, [isFormSubmitted, updateIsFormSubmitted]);
 

@@ -98,6 +98,7 @@ const TransactionList = () => {
 					label="Transaction Type"
 					fieldMapping="type"
 					values={transactionTypes}
+					isFilter={true}
 					onChangeHandler={onChangeTypeFilterHandler}
 				/>
 				<InputField
@@ -125,16 +126,16 @@ const TransactionList = () => {
 					onFilterHandler={onChangeFromToDateFilterHandler}
 				></InputField>
 			</div>
+			<SummaryLine
+				isOpeningBalance={true}
+				balance={
+					getBalanceAsOfDate
+						? getBalanceAsOfDate(transactionDateFromRef.current!, "from")
+						: 0
+				}
+				editable={false}
+			/>
 			<section className={classes["transaction-lines"]}>
-				<SummaryLine
-					isOpeningBalance={true}
-					balance={
-						getBalanceAsOfDate
-							? getBalanceAsOfDate(transactionDateFromRef.current!, "from")
-							: 0
-					}
-					editable={false}
-				/>
 				{transactionList
 					.filter((transaction) => {
 						if (!filterByTransactionType) return true;
@@ -159,16 +160,16 @@ const TransactionList = () => {
 					.map((transaction, key) => {
 						return <TransactionLine key={key} data={transaction} />;
 					})}
-				<SummaryLine
-					isOpeningBalance={false}
-					balance={
-						getBalanceAsOfDate
-							? getBalanceAsOfDate(transactionDateToRef.current!, "to")
-							: 0
-					}
-					editable={false}
-				/>
 			</section>
+			<SummaryLine
+				isOpeningBalance={false}
+				balance={
+					getBalanceAsOfDate
+						? getBalanceAsOfDate(transactionDateToRef.current!, "to")
+						: 0
+				}
+				editable={false}
+			/>
 		</section>
 	);
 };

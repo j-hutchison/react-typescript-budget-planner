@@ -6,6 +6,7 @@
 	width: 100%;
 	padding: 0.75rem 1rem;
 
+	font-size: 1.2rem;
 	border: 1px solid #ebebeb;
 }
 
@@ -15,8 +16,12 @@
 }
 
 .t-line-memo {
-	font-size: 1.2rem;
 }
+
+.t-line-date {
+	min-width: 15%;
+}
+
 .t-line-cta {
 	display: flex;
 	align-items: center;
